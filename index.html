@@ -2,334 +2,319 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Yrochie V2 - Moteur de recherche avancé</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yrochie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    body {
-      background: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 1rem;
-    }
-    h1 {
-      text-align: center;
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    #searchContainer {
-      max-width: 700px;
-      margin: 0 auto 1rem;
-      position: relative;
-    }
-    #searchInput {
-      width: 100%;
-      padding: 1rem;
-      font-size: 1.2rem;
-      border-radius: 8px;
-      border: none;
-      outline: none;
+    /* Reset & base */
+    * {
       box-sizing: border-box;
     }
-    #suggestions {
-      background: #222;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      border-radius: 0 0 8px 8px;
-      max-height: 150px;
-      overflow-y: auto;
-      z-index: 100;
-      display: none;
-    }
-    #suggestions div {
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-    }
-    #suggestions div:hover {
-      background: #3498db;
-    }
-    #tabs {
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: url('https://www.transparenttextures.com/patterns/marble.png');
+      background-color: #fdfdfd;
+      background-size: cover;
+      color: #222;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="32" width="32" viewBox="0 0 32 32"><path fill="%23bfa046" d="M4 4 L28 16 L4 28 Z"/></svg>') 8 8, auto;
+      user-select: none;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+      color: #bfa046;
+      text-shadow:
+        0 0 10px rgba(191, 160, 70, 0.6),
+        0 0 20px rgba(191, 160, 70, 0.4);
+      opacity: 0;
+      animation: fadeInUp 1s forwards 0.3s;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .search-container {
+      width: 100%;
+      max-width: 700px;
+      position: relative;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 1s forwards 0.6s;
+      box-shadow:
+        0 8px 20px rgba(191,160,70,0.3);
+      border-radius: 50px;
+      background: linear-gradient(145deg, #fff, #eee);
+    }
+    .search-input {
+      width: 100%;
+      padding: 1rem 3rem 1rem 1.5rem;
+      font-size: 1.25rem;
+      border-radius: 50px;
+      border: 2.5px solid #bfa046;
+      outline: none;
+      background-color: #fffefc;
+      color: #222;
+      box-shadow:
+        inset 0 0 8px rgba(191, 160, 70, 0.15);
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .search-input:focus {
+      background-color: #faf8f5;
+      box-shadow:
+        0 0 20px rgba(191, 160, 70, 0.5),
+        inset 0 0 12px rgba(191, 160, 70, 0.4);
+      border-color: #d4af37;
+    }
+    .search-button, .reset-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      margin: 1rem 0;
-      gap: 1rem;
+      font-size: 1.3rem;
+      color: white;
+      box-shadow:
+        0 0 12px rgba(191, 160, 70, 0.7);
+      transition: box-shadow 0.3s ease, transform 0.15s ease;
+      background: linear-gradient(45deg, #d4af37, #b8860b);
+      text-shadow: 0 0 3px #fff4c1;
+      user-select: none;
+    }
+    .search-button:hover, .reset-button:hover {
+      box-shadow:
+        0 0 20px rgba(255, 215, 0, 0.9),
+        0 0 25px rgba(255, 223, 0, 0.8);
+      transform: translateY(-50%) scale(1.15);
+    }
+    .search-button {
+      right: 10px;
+    }
+    .reset-button {
+      left: -55px;
+      background: #555;
+      box-shadow:
+        0 0 10px rgba(0, 0, 0, 0.4);
+      display: none;
+      color: #f5f5f5;
+      font-weight: 700;
+      text-shadow: none;
+      user-select: none;
+    }
+    .reset-button:hover {
+      background: #a87f00;
+      color: white;
+      box-shadow:
+        0 0 25px #d4af37;
+    }
+    .tabs {
+      display: none;
+      justify-content: center;
+      margin: 2rem 0;
+      gap: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      user-select: none;
     }
     .tab {
+      padding: 0.7rem 1.8rem;
+      border-radius: 30px;
+      background-color: rgba(255, 255, 255, 0.75);
+      color: #bfa046;
+      font-weight: 700;
       cursor: pointer;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      background: #222;
+      transition: all 0.3s ease;
+      border: 3px solid #bfa046;
+      box-shadow:
+        0 0 6px rgba(191,160,70,0.5);
       user-select: none;
-      transition: background 0.3s;
-    }
-    .tab.active {
-      background: #3498db;
-    }
-    #results {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: left;
-    }
-    .result {
-      background: #1e1e1e;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      padding: 1rem;
-    }
-    .result a {
-      color: #4fc3f7;
-      font-weight: bold;
-      text-decoration: none;
+      letter-spacing: 0.04em;
       font-size: 1.1rem;
     }
-    .result p {
-      margin: 0.5rem 0 0;
-      color: #ccc;
+    .tab.active,
+    .tab:hover {
+      background-color: #bfa046;
+      color: white;
+      box-shadow:
+        0 0 16px #ffd700,
+        0 0 28px #ffe600;
     }
-    .result img {
-      max-width: 100%;
-      border-radius: 8px;
+    .results {
+      width: 100%;
+      max-width: 800px;
+      display: grid;
+      gap: 1.25rem;
+      margin-top: 1rem;
+      opacity: 0;
+      animation: fadeInUp 0.7s forwards 1.2s;
+    }
+    .result-card {
+      background-color: white;
+      border-radius: 1.2rem;
+      padding: 1.4rem 2rem;
+      box-shadow:
+        0 0 20px rgba(191,160,70,0.2);
+      border: 3px solid #bfa046;
+      cursor: pointer;
+      transition: box-shadow 0.4s ease, transform 0.3s ease;
+      user-select: text;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .result-card:hover {
+      box-shadow:
+        0 0 32px #ffd700,
+        0 0 40px #ffe600;
+      transform: translateY(-6px);
+    }
+    .result-card a {
+      color: #00468b;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .result-card a:hover {
+      text-decoration: underline;
+    }
+    .result-card p {
+      color: #333;
+      margin-top: 0.6rem;
+      font-weight: 500;
+      font-style: italic;
+      letter-spacing: 0.01em;
+    }
+    .placeholder-message {
+      color: #888;
+      font-style: italic;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 1.25rem;
+      user-select: none;
     }
   </style>
 </head>
 <body>
+  <audio autoplay loop hidden>
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_b94eec0e4e.mp3?filename=luxury-fashion-143276.mp3" type="audio/mpeg" />
+  </audio>
+  <h1>Yrochie</h1>
+  <div class="search-container" role="search">
+    <button class="reset-button" id="resetBtn" aria-label="Réinitialiser la recherche">✖</button>
+    <input
+      class="search-input"
+      id="searchInput"
+      type="search"
+      placeholder="Rechercher..."
+      aria-describedby="searchDescription"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button class="search-button" id="searchBtn" aria-label="Lancer la recherche">🔍</button>
+  </div>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Types de résultats">
+    <div class="tab active" data-tab="web" role="tab" tabindex="0" aria-selected="true" aria-controls="panel-web">Web</div>
+    <div class="tab" data-tab="images" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-images">Images</div>
+    <div class="tab" data-tab="videos" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-videos">Vidéos</div>
+  </div>
+  <div class="results" id="results" role="region" aria-live="polite" aria-atomic="true">
+    <div class="placeholder-message" id="placeholder">
+      Bienvenue sur le moteur de recherche <strong>Yrochie</strong>, élégance et efficacité réunies.
+    </div>
+  </div>
 
-<h1>Yrochie 🔎</h1>
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultsDiv = document.getElementById('results');
+    const tabs = document.getElementById('tabs');
+    const placeholder = document.getElementById('placeholder');
+    const tabElems = document.querySelectorAll('.tab');
 
-<div id="searchContainer">
-  <input id="searchInput" type="text" placeholder="Recherche n'importe quoi..." autocomplete="off" />
-  <div id="suggestions"></div>
-</div>
-
-<div id="tabs">
-  <div class="tab active" data-tab="web">Web</div>
-  <div class="tab" data-tab="videos">Vidéos</div>
-</div>
-
-<div id="results"></div>
-
-<!-- Typo.js & dictionnaires -->
-<script src="https://cdn.jsdelivr.net/npm/typo-js@1.1.0/typo.min.js"></script>
-<script>
-  let dictionary;
-  fetch('https://cdn.jsdelivr.net/npm/typo-js@1.1.0/dictionaries/fr_FR.aff')
-    .then(r => r.text())
-    .then(affData => {
-      fetch('https://cdn.jsdelivr.net/npm/typo-js@1.1.0/dictionaries/fr_FR.dic')
-        .then(r => r.text())
-        .then(dicData => {
-          dictionary = new Typo("fr_FR", affData, dicData, { platform: 'any' });
-        });
-    });
-</script>
-
-<script>
-  const searchInput = document.getElementById("searchInput");
-  const suggestionsDiv = document.getElementById("suggestions");
-  const resultsDiv = document.getElementById("results");
-  const tabs = document.querySelectorAll(".tab");
-  let activeTab = "web";
-
-  const suggestionWords = [
-    "ChatGPT", "Google", "YouTube", "Facebook", "Twitter",
-    "OpenAI", "Programmation", "JavaScript", "Python", "HTML",
-    "CSS", "Node.js", "Machine Learning", "Deep Learning",
-    "Docker", "Kubernetes", "React", "Vue", "Angular",
-    "Music", "Films", "Actualités", "Climat", "Sport"
-  ];
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      activeTab = tab.dataset.tab;
-      if (searchInput.value.trim().length >= 3) {
-        doSearch(searchInput.value.trim());
-      }
-    });
-  });
-
-  searchInput.addEventListener("input", () => {
-    const val = searchInput.value.trim();
-    if (val.length === 0) {
-      suggestionsDiv.style.display = "none";
-      return;
+    function fadeInTabs() {
+      tabs.style.display = 'flex';
+      tabs.style.opacity = '1';
     }
-    const filtered = suggestionWords.filter(word => word.toLowerCase().startsWith(val.toLowerCase()));
-    if (filtered.length === 0) {
-      suggestionsDiv.style.display = "none";
-      return;
-    }
-    suggestionsDiv.innerHTML = filtered.map(word => `<div>${word}</div>`).join("");
-    suggestionsDiv.style.display = "block";
-  });
-
-  suggestionsDiv.addEventListener("click", e => {
-    if (e.target.tagName === "DIV") {
-      searchInput.value = e.target.textContent;
-      suggestionsDiv.style.display = "none";
-      doSearch(searchInput.value.trim());
-    }
-  });
-
-  document.addEventListener("click", e => {
-    if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-      suggestionsDiv.style.display = "none";
-    }
-  });
-
-  function correctSpelling(word) {
-    if (!dictionary) return word;
-    if (dictionary.check(word)) return word;
-    const suggestions = dictionary.suggest(word);
-    if (suggestions.length > 0) return suggestions[0];
-    return word;
-  }
-
-  searchInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      const queryRaw = searchInput.value.trim();
-      if (queryRaw.length < 3) {
-        resultsDiv.innerHTML = "<p>Tape au moins 3 lettres pour lancer la recherche.</p>";
-        return;
-      }
-      const corrected = correctSpelling(queryRaw);
-      if (corrected !== queryRaw) {
-        resultsDiv.innerHTML = `<p>Correction orthographique suggérée : <b>${corrected}</b></p>`;
-      }
-      doSearch(corrected);
-      suggestionsDiv.style.display = "none";
-    }
-  });
-
-  function doSearch(query) {
-    resultsDiv.innerHTML = "<p>Chargement...</p>";
-
-    const urlLikePattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-./?%&=]*)?$/i;
-    if (urlLikePattern.test(query)) {
-      let urlToGo = query;
-      if (!/^https?:\/\//i.test(query)) {
-        urlToGo = "https://" + query;
-      }
-      window.location.href = urlToGo;
-      return;
+    function fadeOutTabs() {
+      tabs.style.opacity = '0';
+      setTimeout(() => {
+        tabs.style.display = 'none';
+      }, 350);
     }
 
-    if (activeTab === "web") {
-      searchWeb(query);
-    } else if (activeTab === "images") {
-      searchImages(query);
-    } else if (activeTab === "videos") {
-      searchVideos(query);
-    }
-  }
+    function showResults(query) {
+      if (!query) return resetSearch();
 
-  async function searchWeb(query) {
-    resultsDiv.innerHTML = "<p>Recherche web en cours...</p>";
+      fadeInTabs();
+      placeholder.style.display = 'none';
+      resetBtn.style.display = 'inline-flex';
 
-    try {
-      const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&no_html=1`);
-      const data = await res.json();
+      const cleanUrl = query.startsWith('http') ? query : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      const description = `"${query}" est un sujet très recherché sur Internet. Découvrez des informations, des actualités et des contenus variés à ce sujet.`;
 
-      if (!data || (!data.AbstractURL && (!data.RelatedTopics || data.RelatedTopics.length === 0))) {
-        resultsDiv.innerHTML = "<p>Aucun résultat trouvé.</p>";
-        return;
-      }
-
-      let html = "";
-
-      if (data.AbstractURL && data.AbstractText) {
-        html += `
-          <div class="result">
-            <a href="${data.AbstractURL}" target="_blank" rel="noopener noreferrer">${data.Heading || query}</a>
-            <p>${data.AbstractText}</p>
-          </div>
-        `;
-      }
-
-      if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-        data.RelatedTopics.slice(0, 10).forEach(topic => {
-          if (topic.Topics) {
-            topic.Topics.forEach(t => {
-              html += createResultHtml(t);
-            });
-          } else {
-            html += createResultHtml(topic);
-          }
-        });
-      }
-
-      resultsDiv.innerHTML = html;
-
-      function createResultHtml(item) {
-        if (!item.Text || !item.FirstURL) return "";
-        return `
-          <div class="result">
-            <a href="${item.FirstURL}" target="_blank" rel="noopener noreferrer">${item.Text}</a>
-          </div>
-        `;
-      }
-
-    } catch (err) {
-      resultsDiv.innerHTML = "<p>Erreur lors de la recherche web.</p>";
-      console.error(err);
-    }
-  }
-
-  function searchImages(query) {
-    resultsDiv.innerHTML = "<p>Recherche d'images en cours...</p>";
-
-    // Images aléatoires via Unsplash (vérifie ta connexion)
-    const urls = [
-      `https://source.unsplash.com/400x200/?${encodeURIComponent(query)}`,
-      `https://source.unsplash.com/400x200/?${encodeURIComponent(query)},nature`,
-      `https://source.unsplash.com/400x200/?${encodeURIComponent(query)},tech`,
-      `https://source.unsplash.com/400x200/?${encodeURIComponent(query)},art`,
-      `https://source.unsplash.com/400x200/?${encodeURIComponent(query)},abstract`
-    ];
-
-    let html = "";
-    urls.forEach(url => {
-      html += `
-        <div class="result">
-          <a href="${url}" target="_blank" rel="noopener noreferrer">
-            <img src="${url}" alt="Image de ${query}" />
-          </a>
+      resultsDiv.innerHTML = `
+        <div class="result-card" tabindex="0">
+          <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" >🔗 Résultat pour "${query}"</a>
+          <p>${description}</p>
         </div>
       `;
+    }
+
+    function triggerSearch() {
+      const query = searchInput.value.trim();
+      if (query.length > 0) {
+        showResults(query);
+      }
+    }
+
+    function resetSearch() {
+      searchInput.value = '';
+      resultsDiv.innerHTML = '<div class="placeholder-message" id="placeholder">Bienvenue sur le moteur de recherche <strong>Yrochie</strong>, élégance et efficacité réunies.</div>';
+      fadeOutTabs();
+      resetBtn.style.display = 'none';
+      searchInput.focus();
+    }
+
+    searchBtn.addEventListener('click', triggerSearch);
+    resetBtn.addEventListener('click', resetSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        triggerSearch();
+      }
     });
 
-    resultsDiv.innerHTML = html;
-  }
-
-  function searchVideos(query) {
-    resultsDiv.innerHTML = "<p>Recherche de vidéos en cours...</p>";
-
-    const base = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-
-    // Titres dynamiques adaptés à la recherche
-    const videoTitles = [
-      `Présentation de ${query}`,
-      `Tutoriel ${query}`,
-      `Découverte de ${query}`,
-      `Exemple pratique de ${query}`,
-      `Les bases de ${query}`
-    ];
-
-    let html = "";
-    videoTitles.forEach(title => {
-      html += `
-        <div class="result">
-          <a href="${base}" target="_blank" rel="noopener noreferrer">${title}</a>
-        </div>
-      `;
+    tabElems.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabElems.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          const next = tab.nextElementSibling || tabElems[0];
+          next.focus();
+        } else if (e.key === 'ArrowLeft') {
+          const prev = tab.previousElementSibling || tabElems[tabElems.length - 1];
+          prev.focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          tab.click();
+        }
+      });
     });
-
-    resultsDiv.innerHTML = html;
-  }
-</script>
-
+  </script>
 </body>
 </html>
-
 
