@@ -1,135 +1,558 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yrochie - Moteur de recherche</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yrochie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    /* Design chic marbre blanc et or */
     body {
-      background-color: #f5f5f5;
-      font-family: 'Georgia', serif;
       margin: 0;
-      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: url('https://www.transparenttextures.com/patterns/marble.png') no-repeat center center fixed;
+      background-color: #fdfdfd;
+      background-size: cover;
       color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      min-height: 100vh;
+      overflow-x: hidden;
+      animation: fadeInBody 1.2s ease forwards;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      text-align: center;
+    @keyframes fadeInBody {
+      from {opacity:0;}
+      to {opacity:1;}
     }
     h1 {
-      font-size: 3rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 500;
       margin-bottom: 1rem;
-      color: #333;
+      letter-spacing: 2px;
+      color: #bfa046;
+      text-shadow: 0 0 6px rgba(191, 160, 70, 0.5);
+      user-select: none;
     }
-    input[type="text"] {
-      width: 70%;
-      padding: 0.5rem;
-      font-size: 1.2rem;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1.2rem;
-      margin-left: 0.5rem;
-      cursor: pointer;
-    }
-    #definition {
-      margin-top: 2rem;
-      text-align: left;
-      background: #fff;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    #definition h2 {
-      font-size: 1.5rem;
-      color: #000;
-      margin-bottom: 0.5rem;
-    }
-    #images {
-      margin-top: 2rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-    #images img {
+    .search-container {
       width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      max-width: 720px;
+      position: relative;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s ease 0.5s forwards;
+      opacity: 0;
     }
-    #quota-warning {
-      color: red;
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .search-input {
+      width: 100%;
+      padding: 1rem 3.5rem 1rem 1.7rem;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      border: 2px solid #bfa046;
+      outline: none;
+      background-color: #fff;
+      color: #222;
+      box-shadow: 0 0 10px rgba(191, 160, 70, 0.2);
+      transition: background 0.3s, box-shadow 0.3s;
+      font-weight: 500;
+    }
+    .search-input::placeholder {
+      color: #bfa046cc;
+      font-style: italic;
+    }
+    .search-input:focus {
+      background-color: #f8f8f8;
+      box-shadow: 0 0 18px rgba(191, 160, 70, 0.45);
+    }
+    .search-button {
+      position: absolute;
+      right: 50px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(45deg, #d4af37, #b8860b);
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(191, 160, 70, 0.6);
+      font-size: 1.4rem;
+      color: white;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    .search-button:hover {
+      background: linear-gradient(45deg, #c89f2f, #a37304);
+    }
+    .reset-button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #666;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    .reset-button:hover {
+      background: #ddd;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0 1rem;
+      gap: 1.5rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease 1.2s forwards;
+      user-select: none;
+    }
+    .tab {
+      padding: 0.6rem 1.6rem;
+      border-radius: 25px;
+      background-color: rgba(255, 255, 255, 0.75);
+      color: #bfa046;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid #bfa046;
+      box-shadow: 0 0 8px rgba(191, 160, 70, 0.3);
+      transition: all 0.3s ease;
+      user-select: none;
+      font-size: 1.1rem;
+    }
+    .tab.active,
+    .tab:hover {
+      background-color: #bfa046;
+      color: white;
+      box-shadow: 0 0 12px rgba(191, 160, 70, 0.8);
+    }
+    .results {
+      width: 100%;
+      max-width: 840px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+      gap: 1.2rem;
       margin-top: 1rem;
+      animation: fadeInUp 0.8s ease 1.5s forwards;
+      opacity: 0;
+    }
+    .result-card {
+      background-color: white;
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      box-shadow: 0 0 20px rgba(191, 160, 70, 0.25);
+      border: 2px solid #bfa046;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.3s ease;
+    }
+    .result-card:hover {
+      box-shadow: 0 0 26px rgba(191, 160, 70, 0.5);
+    }
+    .result-card a {
+      color: #b8860b;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 0.3rem;
+      word-break: break-word;
+      user-select: text;
+    }
+    .result-card a:hover {
+      text-decoration: underline;
+    }
+    .result-card p {
+      color: #444;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-top: 0.3rem;
+      user-select: text;
+    }
+    .result-imgs {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .result-imgs a {
+      flex: 0 1 100px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(191,160,70,0.3);
+      transition: box-shadow 0.3s ease;
+    }
+    .result-imgs a:hover {
+      box-shadow: 0 0 14px rgba(191,160,70,0.7);
+    }
+    .result-imgs img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+    }
+    .placeholder-message {
+      color: #888;
+      font-style: italic;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 1.3rem;
+      user-select: none;
+      grid-column: 1 / -1;
+    }
+    .quota-message {
+      margin-top: 1rem;
+      color: #b00020;
+      font-weight: 700;
+      text-align: center;
+      font-size: 1.3rem;
+      grid-column: 1 / -1;
+      user-select: none;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    /* Responsive */
+    @media (max-width: 700px) {
+      .search-input {
+        font-size: 1.1rem;
+      }
+      .search-button {
+        right: 42px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+      }
+      .reset-button {
+        width: 28px;
+        height: 28px;
+      }
+      .tabs {
+        gap: 1rem;
+      }
+      .tab {
+        font-size: 1rem;
+        padding: 0.5rem 1.1rem;
+      }
+      .result-imgs a {
+        flex: 0 1 80px;
+      }
+      .result-imgs img {
+        width: 80px;
+        height: 80px;
+      }
     }
   </style>
 </head>
 <body>
-  <audio id="background-music" src="musique.mp3" autoplay loop></audio>
-  <div class="container">
-    <h1>Yrochie</h1>
-    <input type="text" id="searchInput" placeholder="Rechercher...">
-    <button onclick="launchSearch()">Rechercher</button>
-    <div id="quota-warning" class="hidden">Limite d'utilisation atteinte. Réessayez demain.</div>
-    <div id="resultSection">
-      <div id="definition"></div>
-      <div id="images"></div>
+  <!-- Musique de fond -->
+  <audio autoplay loop muted id="bgMusic">
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_b94eec0e4e.mp3?filename=luxury-fashion-143276.mp3" type="audio/mpeg" />
+  </audio>
+
+  <h1>Yrochie</h1>
+
+  <div class="search-container">
+    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher..." autocomplete="off" />
+    <button class="search-button" id="searchBtn" title="Rechercher">🔍</button>
+    <button class="reset-button" id="resetBtn" title="Réinitialiser">✖</button>
+  </div>
+
+  <div class="tabs" id="tabs" style="display:none;">
+    <div class="tab active" data-tab="web">Web</div>
+    <div class="tab" data-tab="images">Images</div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="placeholder-message" id="placeholder">
+      Bienvenue sur le moteur de recherche <strong>Yrochie</strong>, élégance et efficacité réunies.
     </div>
   </div>
 
+  <div class="quota-message" id="quotaMessage" style="display:none;"></div>
+
   <script>
-    const QUOTA_LIMIT = 5000;
-    let searchCount = localStorage.getItem('searchCount') || 0;
-    const warning = document.getElementById('quota-warning');
+    // --- TES CLÉS API ici ---
+    const UNSPLASH_ACCESS_KEY = 'didcv8FtmLtfyVyKAfjfyTjEDkwsSVzUaAuIpdCuSaU';
 
-    function translateQuery(query) {
-      return fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=fr|en`)
-        .then(response => response.json())
-        .then(data => data.responseData.translatedText.toLowerCase());
+    // --- LIMITES QUOTAS (exemples, à adapter selon réelles limites) ---
+    // DuckDuckGo n'a pas de limite, on fixe une limite haute arbitraire.
+    const LIMITS = {
+      duckduckgo: 20000,
+      unsplash: 5000
+    };
+    const GLOBAL_LIMIT = Math.min(LIMITS.duckduckgo, LIMITS.unsplash);
+
+    // --- GESTION DU COMPTEUR DE REQUETES DANS localStorage ---
+    const STORAGE_KEY = 'yrochie_daily_usage';
+    const STORAGE_DATE_KEY = 'yrochie_usage_date';
+
+    function getTodayDateStr() {
+      const now = new Date();
+      return now.toISOString().slice(0, 10);
     }
 
-    async function launchSearch() {
-      if (searchCount >= QUOTA_LIMIT) {
-        warning.classList.remove('hidden');
-        return;
+    function loadUsage() {
+      const storedDate = localStorage.getItem(STORAGE_DATE_KEY);
+      if (storedDate !== getTodayDateStr()) {
+        localStorage.setItem(STORAGE_DATE_KEY, getTodayDateStr());
+        localStorage.setItem(STORAGE_KEY, '0');
+        return 0;
       }
-      const input = document.getElementById('searchInput').value;
-      const englishQuery = await translateQuery(input);
-      getDefinition(input);
-      getImages(englishQuery);
-      searchCount++;
-      localStorage.setItem('searchCount', searchCount);
+      return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
     }
 
-    function getDefinition(query) {
-      fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=0`)
-        .then(response => response.json())
-        .then(data => {
-          const defDiv = document.getElementById('definition');
-          if (data.AbstractText) {
-            defDiv.innerHTML = `<h2>Définition :</h2><p>${data.AbstractText}</p>`;
-          } else {
-            defDiv.innerHTML = `<h2>Définition :</h2><p>Aucune définition trouvée.</p>`;
-          }
-        });
+    function saveUsage(count) {
+      localStorage.setItem(STORAGE_KEY, count.toString());
     }
 
-    function getImages(query) {
-      fetch(`https://api.unsplash.com/search/photos?query=${query}&client_id=didcv8FtmLtfyVyKAfjfyTjEDkwsSVzUaAuIpdCuSaU`)
-        .then(response => response.json())
-        .then(data => {
-          const imagesDiv = document.getElementById('images');
-          imagesDiv.innerHTML = '';
-          if (data.results && data.results.length > 0) {
-            data.results.forEach(img => {
-              imagesDiv.innerHTML += `<a href="${img.links.html}" target="_blank"><img src="${img.urls.small}" alt="${img.alt_description}"></a>`;
-            });
-          } else {
-            imagesDiv.innerHTML = '<p>Aucune image trouvée.</p>';
-          }
-        });
+    function incrementUsage() {
+      let count = loadUsage();
+      count++;
+      saveUsage(count);
+      return count;
     }
+
+    // --- ELEMENTS DOM ---
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultsDiv = document.getElementById('results');
+    const tabs = document.getElementById('tabs');
+    const placeholder = document.getElementById('placeholder');
+    const tabElems = document.querySelectorAll('.tab');
+    const quotaMessage = document.getElementById('quotaMessage');
+
+    // --- AFFICHAGE DES ONGLES ---
+    function showTabs() {
+      tabs.style.display = 'flex';
+    }
+    function hideTabs() {
+      tabs.style.display = 'none';
+    }
+
+    // --- RESET ---
+    function resetSearch() {
+      searchInput.value = '';
+      resultsDiv.innerHTML = '<div class="placeholder-message" id="placeholder">Bienvenue sur le moteur de recherche <strong>Yrochie</strong>, élégance et efficacité réunies.</div>';
+      hideTabs();
+      quotaMessage.style.display = 'none';
+    }
+
+    // --- CHECK QUOTA ---
+    function isQuotaReached() {
+      return loadUsage() >= GLOBAL_LIMIT;
+    }
+
+    // --- AFFICHAGE MESSAGE LIMITE ---
+    function showQuotaMessage() {
+      quotaMessage.textContent = `Vous avez atteint la limite d’utilisation quotidienne (${GLOBAL_LIMIT} recherches). Revenez demain.`;
+      quotaMessage.style.display = 'block';
+    }
+
+    // --- PETITE fonction traduction simple FR -> EN pour images (basique, tu peux ajouter d'autres si tu veux) ---
+    function translateToEnglish(text) {
+      const dict = {
+        'chat': 'cat',
+        'chien': 'dog',
+        'voiture': 'car',
+        'maison': 'house',
+        'ordinateur': 'computer',
+        'fleur': 'flower',
+        'arbre': 'tree',
+        'plage': 'beach',
+        'montagne': 'mountain',
+        'ciel': 'sky',
+        'bateau': 'boat',
+        'ville': 'city',
+        'oiseau': 'bird',
+        'femme': 'woman',
+        'homme': 'man',
+        'enfant': 'child',
+        'musique': 'music',
+        'livre': 'book'
+      };
+      const lower = text.toLowerCase();
+      return dict[lower] || text;
+    }
+
+    // --- RECHERCHE WEB via DuckDuckGo ---
+    async function fetchDuckDuckGo(query) {
+      try {
+        const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=0&pretty=1`);
+        if (!resp.ok) throw new Error('DuckDuckGo API non disponible');
+        const data = await resp.json();
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    // --- RECHERCHE IMAGES via Unsplash ---
+    async function fetchUnsplash(query) {
+      try {
+        const queryEn = translateToEnglish(query);
+        const resp = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(queryEn)}&per_page=9&client_id=${UNSPLASH_ACCESS_KEY}`);
+        if (!resp.ok) throw new Error('Unsplash API non disponible');
+        const data = await resp.json();
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    // --- FONCTION PRINCIPALE DE RECHERCHE ---
+    async function showResults(query) {
+      if (!query) return;
+
+      if (isQuotaReached()) {
+        resultsDiv.innerHTML = '';
+        showQuotaMessage();
+        hideTabs();
+        return;
+      } else {
+        quotaMessage.style.display = 'none';
+      }
+
+      showTabs();
+      resultsDiv.innerHTML = '';
+
+      incrementUsage();
+
+      // Recherche définition / description
+      const ddgData = await fetchDuckDuckGo(query);
+
+      let webHTML = '';
+      if (ddgData && ddgData.AbstractURL) {
+        webHTML += `
+          <div class="result-card">
+            <a href="${ddgData.AbstractURL}" target="_blank" rel="noopener noreferrer" title="Lien direct vers ${ddgData.Heading || query}">${ddgData.Heading || query}</a>
+            <p>${ddgData.AbstractText || 'Découvrez des informations sur "' + query + '".'}</p>
+          </div>
+        `;
+      } else if (ddgData && ddgData.RelatedTopics && ddgData.RelatedTopics.length) {
+        // Si pas de définition mais des sujets proches
+        let firstTopic = ddgData.RelatedTopics[0];
+        // Parfois RelatedTopics contient des sous-éléments
+        if (firstTopic.Text) {
+          webHTML += `
+            <div class="result-card">
+              <a href="${firstTopic.FirstURL}" target="_blank" rel="noopener noreferrer" title="Lien direct">${firstTopic.Text.split(' - ')[0]}</a>
+              <p>${firstTopic.Text.split(' - ').slice(1).join(' - ') || 'Informations complémentaires'}</p>
+            </div>
+          `;
+        }
+      } else {
+        webHTML += `
+          <div class="result-card">
+            <p>Aucune définition claire trouvée pour "${query}". Vous pouvez explorer les images ou refaire une recherche.</p>
+          </div>
+        `;
+      }
+
+      // Recherche images
+      const unsplashData = await fetchUnsplash(query);
+      let imagesHTML = '';
+      if (unsplashData && unsplashData.results && unsplashData.results.length > 0) {
+        imagesHTML += '<div class="result-imgs">';
+        unsplashData.results.forEach(img => {
+          const alt = img.alt_description || query;
+          imagesHTML += `
+            <a href="${img.links.html}" target="_blank" rel="noopener noreferrer" title="${alt}">
+              <img src="${img.urls.small}" alt="${alt}" loading="lazy" />
+            </a>
+          `;
+        });
+        imagesHTML += '</div>';
+      } else {
+        imagesHTML = '<p style="grid-column:1/-1; text-align:center; font-style: italic; color:#999;">Aucune image trouvée.</p>';
+      }
+
+      // On garde les onglets visibles
+      showTabs();
+
+      // Afficher onglet web + images en mémoire
+      tabElems.forEach(tab => {
+        if (tab.dataset.tab === 'web') tab.dataset.contentHTML = webHTML;
+        else if (tab.dataset.tab === 'images') tab.dataset.contentHTML = imagesHTML;
+      });
+
+      // Afficher contenu onglet actif (par défaut web)
+      showTabContent('web');
+    }
+
+    // --- GESTION AFFICHAGE ONGLET ---
+    function showTabContent(tabName) {
+      quotaMessage.style.display = 'none';
+      resultsDiv.innerHTML = '';
+      const tab = Array.from(tabElems).find(t => t.dataset.tab === tabName);
+      if (tab && tab.dataset.contentHTML) {
+        resultsDiv.innerHTML = tab.dataset.contentHTML;
+      } else {
+        resultsDiv.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Aucun contenu à afficher.</p>';
+      }
+      // Gérer classes active onglet
+      tabElems.forEach(t => {
+        if (t.dataset.tab === tabName) t.classList.add('active');
+        else t.classList.remove('active');
+      });
+    }
+
+    // --- EVENTS ---
+    searchBtn.addEventListener('click', () => {
+      const q = searchInput.value.trim();
+      if (q.length === 0) return;
+      showResults(q);
+    });
+
+    resetBtn.addEventListener('click', resetSearch);
+
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchBtn.click();
+      }
+    });
+
+    tabElems.forEach(tab => {
+      tab.addEventListener('click', () => {
+        showTabContent(tab.dataset.tab);
+      });
+    });
+
+    // --- INIT ---
+    resetSearch();
+
+    // --- OPTION pour musique : clique sur titre pour mute/unmute ---
+    document.querySelector('h1').style.cursor = 'pointer';
+    document.querySelector('h1').title = 'Cliquer pour activer/désactiver la musique';
+    const bgMusic = document.getElementById('bgMusic');
+    document.querySelector('h1').addEventListener('click', () => {
+      if (bgMusic.muted) {
+        bgMusic.muted = false;
+      } else {
+        bgMusic.muted = true;
+      }
+    });
   </script>
 </body>
 </html>
